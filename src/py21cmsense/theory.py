@@ -118,6 +118,25 @@ class EOS2021(TheorySpline):
 
         self.spline = RectBivariateSpline(self.z, self.k, self.coeval_ps, ky=1)
 
+class Fiducial_21cmSPACE(TheorySpline):
+    """Fiducial theory model from 21cmSPACE."""
+
+    use_littleh = False
+
+    def __init__(self):
+        pth = Path(__file__).parent / "data/21cmSPACE"
+        self.z = np.fromfile(pth / "21cmSPACE_fiducial_zlist.bin")
+        self.k = np.fromfile(pth / "21cmSPACE_fiducial_kbins.bin")
+        coeval_ps = np.fromfile(pth / "21cmSPACE_fiducial_P21.bin").reshape(
+            (self.z.size, self.k.size)
+        )
+
+        # Sort in order of ascending redshift
+        order = np.argsort(self.z)
+        self.z = self.z[order]
+        self.coeval_ps = coeval_ps[order]
+
+        self.spline = RectBivariateSpline(self.z, self.k, self.coeval_ps, ky=1)
 
 def _get_eos2016_data(name: str):
     pth = Path(__file__).parent / f"data/{name}"
